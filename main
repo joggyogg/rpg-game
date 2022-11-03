@@ -1,0 +1,677 @@
+import random as rand
+
+
+# making the yes or no question function
+def y_or_n(question):
+    reply = str(input(f"{question} (y/n)")).lower()
+    try:
+        if reply[0] == 'y':
+            return True
+        if reply[0] == 'n':
+            return False
+        else:
+            return y_or_n("Uhhhh... please enter ")
+    except IndexError:
+        print("")
+
+
+# making combat function
+def combat(enemy):
+    print(f"{Character.name} encounters a {enemy.name}")
+    print(f"""
+    ENEMY HEALTH:   {enemy.health}
+    PLAYER HEALTH:  {Character.health}""")
+
+    turn = 1
+    while Character.health > 0 and enemy.health > 0:
+        if turn == 1:
+            try:
+                print(f"{Character.name}'s turn")
+                print(f"""your attacks are:
+                1 - {Character.char_class_abilities[0].name}
+                2 - {Character.char_class_abilities[1].name}
+                """)
+                attack = int(input("choose your attack! "))
+                enemy.health -= Character.char_class_abilities[attack - 1].dam
+                Character.health += Character.char_class_abilities[attack - 1].heal
+                if Character.health > Character.max_health:
+                    Character.health = Character.max_health
+
+                print(f"""
+    {Character.name} USED {Character.char_class_abilities[attack - 1].name}
+    it hit for {Character.char_class_abilities[attack - 1].dam}
+    and healed for {Character.char_class_abilities[attack - 1].heal}
+    ENEMY HEALTH:   {round(enemy.health)}
+    PLAYER HEALTH:  {round(Character.health)}""")
+
+            except ValueError or IndexError:
+                print("enter a valid answer")
+                continue
+            turn = 2
+        if turn == 2:
+            try:
+                print(f"{enemy.name}'s turn")
+                enemy_attack = rand.randint(0, 1)
+                enemy.health += enemy.enemy_abilities[enemy_attack].heal
+                if enemy.health > enemy.max_health:
+                    enemy.health = enemy.max_health
+
+                Character.health -= enemy.enemy_abilities[enemy_attack].dam
+                print(f"""
+    {enemy.name} USED {enemy.enemy_abilities[enemy_attack].name}
+    it hit for {enemy.enemy_abilities[enemy_attack].dam}
+    and healed for {enemy.enemy_abilities[enemy_attack].heal}
+    ENEMY HEALTH:   {enemy.health}
+    PLAYER HEALTH:  {Character.health}""")
+
+            except ValueError or IndexError:
+                print("enter a valid answer")
+                continue
+            turn = 1
+
+    # win or loss check and subsequent level reward.
+    if Character.health < 0:
+        print("GAME OVER")
+    if enemy.health < 0:
+        Character.char_lvl += 1
+        print(f"YOU DEFEATED {enemy.name}")
+        for item in [0, 1, 2, 3, 4, 5, 6]:
+            special[item] = special[item] + Character.char_lvl
+    print(f"your new level is {Character.char_lvl}")
+    print(f"""
+            STRENGTH     :{special[0]}
+            PERCEPTION   :{special[1]}
+            ENDURANCE    :{special[2]}
+            CHARISMA     :{special[3]}
+            INTELLIGENCE :{special[4]}
+            AGILITY      :{special[5]}
+            LUCK         :{special[6]}
+            """)
+
+
+# character creation
+# create character class start variable
+char_class = 0
+# create experience start variable
+char_lvl = 0
+# create special start variables
+special = [1, 1, 1, 1, 1, 1, 1]
+
+# S.P.E.C.I.A.L these are the character interaction stats
+satisfied = False
+while not satisfied:
+    char_spec_pts = 42
+    while True:
+        try:
+            print(f"points remaining: {char_spec_pts}")
+            print("STRENGTH increases your carrying capacity and how hard you hit with melee weapons")
+            special[0] = int(input("STRENGTH: "))
+            if special[0] > 10 or special[0] < 1:
+                print("""
+                !!!must be 10 or less and not 0!!!
+                """)
+                special[0] = 1
+            elif special[0] > char_spec_pts:
+                print("""
+                !!!you don't have enough points left!!!
+                """)
+                special[0] = 1
+            else:
+                break
+        except ValueError:
+            print("""
+            !!!must be a number!!!
+            """)
+            special[0] = 1
+        else:
+            continue
+    char_spec_pts -= special[0]
+
+    while True:
+        try:
+            print(f"points remaining: {char_spec_pts}")
+            print("PERCEPTION is your ability to better sense details in your surroundings")
+            special[1] = int(input("PERCEPTION: "))
+            if special[1] > 10 or special[1] < 1:
+                print("""
+                !!!must be 10 or less!!!
+                """)
+                special[1] = 1
+            elif special[1] > char_spec_pts:
+                print("""
+                !!!you don't have enough points left!!!
+                """)
+                special[1] = 1
+            else:
+                break
+        except ValueError:
+            print("""
+            !!!must be a number!!!
+            """)
+            special[1] = 1
+        else:
+            continue
+    char_spec_pts -= special[1]
+
+    while True:
+        try:
+            print(f"points remaining: {char_spec_pts}")
+            print("Endurance increases your health points, health regeneration and how resistant you are to to attacks")
+            special[2] = int(input("ENDURANCE: "))
+            if special[2] > 10 or special[2] < 1:
+                print("""
+                !!!must be 10 or less!!!
+                """)
+                special[2] = 1
+            elif special[2] > char_spec_pts:
+                print("""
+                !!!you don't have enough points left!!!
+                """)
+                special[2] = 1
+            else:
+                break
+        except ValueError:
+            print("""
+            !!!must be a number!!!
+            """)
+            special[2] = 1
+        else:
+            continue
+    char_spec_pts -= special[2]
+
+    while True:
+        try:
+            print(f"points remaining: {char_spec_pts}")
+            print("CHARISMA increases your rate of success with persuasion, intimidation, flirting etc")
+            special[3] = int(input("CHARISMA: "))
+            if special[3] > 10 or special[3] < 1:
+                print("""
+                !!!must be 10 or less!!!
+                """)
+                special[3] = 1
+            elif special[3] > char_spec_pts:
+                print("""
+                !!!you don't have enough points left!!!
+                """)
+                special[3] = 1
+            else:
+                break
+        except ValueError:
+            print("""
+            !!!must be a number!!!
+            """)
+            special[3] = 1
+        else:
+            continue
+    char_spec_pts -= special[3]
+
+    while True:
+        try:
+            print(f"points remaining: {char_spec_pts}")
+            print("INTELLIGENCE is used to successfully hack computers and how much damage you do with science weapons")
+            special[4] = int(input("INTELLIGENCE: "))
+            if special[4] > 10 or special[4] < 1:
+                print("""
+                !!!must be 10 or less!!!
+                """)
+                special[4] = 1
+            elif special[4] > char_spec_pts:
+                print("""
+                !!!you don't have enough points left!!!
+                """)
+                special[4] = 1
+            else:
+                break
+        except ValueError:
+            print("""
+            !!!must be a number!!!
+            """)
+            special[4] = 1
+        else:
+            continue
+    char_spec_pts -= special[4]
+
+    while True:
+        try:
+            print(f"points remaining: {char_spec_pts}")
+            print("AGILITY increases your chance to dodge incoming attacks")
+            special[5] = int(input("AGILITY: "))
+            if special[5] > 10 or special[5] < 1:
+                print("""
+                !!!must be 10 or less!!!
+                """)
+                special[5] = 1
+            elif special[5] > char_spec_pts:
+                print("""
+                !!!you don't have enough points left!!!
+                """)
+                special[5] = 1
+            else:
+                break
+        except ValueError:
+            print("""
+            !!!must be a number!!!
+            """)
+            special[5] = 1
+        else:
+            continue
+    char_spec_pts -= special[5]
+
+    while True:
+        try:
+            print(f"points remaining: {char_spec_pts}")
+            print(
+                "LUCK gives you a random chance to pass a speech check,"
+                " hack a computer, do double damage in a hit, etc...")
+            special[6] = int(input("LUCK: "))
+            if special[6] > 10 or special[6] < 1:
+                print("""
+                !!!must be 10 or less!!!
+                """)
+                special[6] = 1
+            elif special[6] > char_spec_pts:
+                print("""
+                !!!you don't have enough points!!!
+                """)
+                special[6] = 1
+            else:
+                break
+        except ValueError:
+            print("""
+            !!!must be a number!!!
+            """)
+            special[6] = 1
+        else:
+            continue
+    char_spec_pts -= special[6]
+    if char_spec_pts >= 0:
+        satisfied = True
+    print(f"""
+        STRENGTH     :{special[0]}
+        PERCEPTION   :{special[1]}
+        ENDURANCE    :{special[2]}
+        CHARISMA     :{special[3]}
+        INTELLIGENCE :{special[4]}
+        AGILITY      :{special[5]}
+        LUCK         :{special[6]}
+        """)
+
+    while True:
+        if char_spec_pts > 0:
+            print("""
+            !!!you still have points you could use!!!
+            """)
+        satisfied = y_or_n("are you satisfied with these results?")
+        if satisfied:
+            break
+        if not satisfied:
+            print("")
+
+            break
+
+
+print("well done, you have made your character S.P.E.C.I.A.L!!!")
+print("")
+
+# races
+# these are how your race effects your S.P.E.C.I.A.L
+race_attributes = [[2, 2, 2, 2, 2, 2, 2],
+                   [3, 2, 3, 0, 5, 0, 1],
+                   [0, 1, 0, 3, 4, 3, 3],
+                   [0, 3, 0, 5, 2, 3, 1],
+                   [5, 1, 5, 0, 0, 2, 1]]
+
+races = ["human", "dwarf", "gnome", "elf", "orc"]
+print("""
+in this world there are 5 races
+1) human
+2) dwarf
+3) gnome
+4) elf
+5) orc
+""")
+
+# race information
+while True:
+    try:
+        q = y_or_n("would you like to know more about the races? ")
+        if q:
+            qa = int(input("""which race 1 - 5 
+            """))
+            if qa == 1:
+                print("humans are...")
+                print(f"""{races[0]} have the following S.P.E.C.I.A.L modifiers: 
+                {race_attributes[0]}
+                """)
+            if qa == 2:
+                print("dwarves are...")
+                print(f"""{races[1]} have the following S.P.E.C.I.A.L modifiers: 
+                {race_attributes[1]}
+                """)
+            if qa == 3:
+                print("gnomes are....")
+                print(f"""{races[2]} have the following S.P.E.C.I.A.L modifiers: 
+                {race_attributes[2]}
+                """)
+            if qa == 4:
+                print("elves are...")
+                print(f"""{races[3]} have the following S.P.E.C.I.A.L modifiers: 
+                {race_attributes[3]}
+                """)
+            if qa == 5:
+                print("orcs are....")
+                print(f"""{races[4]} have the following S.P.E.C.I.A.L modifiers: 
+                {race_attributes[4]}
+                """)
+        if not q:
+            break
+    except ValueError or IndexError:
+        print("invalid answer")
+# choose race
+while True:
+    try:
+        char_race = int(input("choose a race for your character 1 - 5 "))  # characters chosen race is char_race
+        print(f"you have chosen {races[char_race - 1]} ")
+        print(f"""{races[char_race - 1]} have the following S.P.E.C.I.A.L modifiers: 
+        {race_attributes[char_race - 1]}
+        """)
+        # race modify S.P.E.C.I.A.L
+        race_modify = race_attributes[char_race - 1]
+        for i in [0, 1, 2, 3, 4, 5, 6]:
+            special[i] = special[i] + race_modify[i]
+        break
+    except ValueError or IndexError:
+        print("invalid input")
+        continue
+
+print(f""" Your new S.P.E.C.I.A.L attributes become
+{special}
+""")
+
+print(f"""
+        STRENGTH     :{special[0]}
+        PERCEPTION   :{special[1]}
+        ENDURANCE    :{special[2]}
+        CHARISMA     :{special[3]}
+        INTELLIGENCE :{special[4]}
+        AGILITY      :{special[5]}
+        LUCK         :{special[6]}
+        """)
+
+# class
+# these are how your class effects your S.P.E.C.I.A.L
+class_attributes = [[10, 0, 5, 0, 0, 0, 0],
+                    [0, 5, 0, 0, 10, 0, 0],
+                    [0, 5, 0, 0, 0, 10, 0],
+                    [0, 0, 0, 5, 10, 0, 0],
+                    [0, 0, 0, 10, 5, 0, 0]]
+classes = ["Warrior", "Mage", "Rogue", "Cleric", "Bard"]
+print("""
+These are the 5 classes you have to choose from
+1) Warrior
+2) Mage
+3) Rogue
+4) Cleric
+5) Bard
+""")
+while True:
+    try:
+        q = y_or_n("would you like to know more about the Classes? ")
+        if q:
+            qa = int(input("""which class 1 - 5 
+            """))
+            if qa == 1:
+                print("Warriors are...")
+                print(f"""{classes[0]} have the following S.P.E.C.I.A.L modifiers: 
+                {class_attributes[0]}
+                """)
+            if qa == 2:
+                print("Mages are...")
+                print(f"""{classes[1]} have the following S.P.E.C.I.A.L modifiers: 
+                {class_attributes[1]}
+                """)
+            if qa == 3:
+                print("Rogues are....")
+                print(f"""{classes[2]} have the following S.P.E.C.I.A.L modifiers: 
+                {class_attributes[2]}
+                """)
+            if qa == 4:
+                print("Clerics are...")
+                print(f"""{classes[3]} have the following S.P.E.C.I.A.L modifiers: 
+                {class_attributes[3]}
+                """)
+            if qa == 5:
+                print("Bards are....")
+                print(f"""{classes[4]} have the following S.P.E.C.I.A.L modifiers: 
+                {class_attributes[4]}
+                """)
+        if not q:
+            break
+    except ValueError or IndexError:
+        print("invalid answer")
+
+while True:
+    try:
+        char_class = int(input("choose a Class for your character 1 - 5 "))  # characters chosen class is char_class
+        print(f"you have chosen {classes[char_class - 1]} ")
+        print(f"""{classes[char_class - 1]} have the following S.P.E.C.I.A.L modifiers: 
+        {class_attributes[char_class - 1]}
+        """)
+        class_modify = class_attributes[char_class - 1]
+        for i in [0, 1, 2, 3, 4, 5, 6]:
+            special[i] = special[i] + class_modify[i]
+        break
+    except ValueError or IndexError:
+        print("invalid input")
+        continue
+
+print(f""" Your p new S.P.E.C.I.A.L attributes become
+{special}
+""")
+
+print(f"""
+        STRENGTH     :{special[0]}
+        PERCEPTION   :{special[1]}
+        ENDURANCE    :{special[2]}
+        CHARISMA     :{special[3]}
+        INTELLIGENCE :{special[4]}
+        AGILITY      :{special[5]}
+        LUCK         :{special[6]}
+        """)
+
+    # name
+while True:
+    char_name = input(" what's your name? ")
+    name_q = y_or_n(f"hello {char_name} are you happy with that name? ")
+    if name_q:
+        break
+    if not name_q:
+        print("")
+
+    # age
+char_age_group = None
+char_age = int(input("what's your age? "))
+while 17 > char_age:
+    char_age = int(input("that's too young, try being older!"))
+while char_age > 60:
+    char_age = int(input("that's too old, try being younger!"))
+if 30 > char_age >= 17:
+    char_age_group = 1  # young
+if 45 > char_age > 30:
+    char_age_group = 2  # middle aged
+if 60 >= char_age > 45:
+    char_age_group = 3  # old
+
+if char_age_group == 1:
+    input("don't you think you're a little young for an adventure like this?")
+elif char_age_group == 2:
+    input("are you ready for an adventure?")
+elif char_age_group == 3:
+    input("arent you a bit too old to still be adventuring?")
+input("well either way, lets get on with it!")
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# class and enemy abilities
+
+
+# classless
+class ClassLess:
+    class Punch:
+        name = "Punch"
+        dam = 10
+        heal = 0
+
+    class Kick:
+        name = "Kick"
+        dam = 15
+        heal = 0
+
+
+# character
+class Character:
+    name = char_name
+    max_health = 100 + special[2]
+    health = 100 + special[2]
+    char_class_abilities = [ClassLess.Punch, ClassLess.Kick]
+    special = []
+
+
+# warrior
+class Warrior:
+    class Slash:
+        mod = special[0]
+        name = "Slash"
+        dam = 10 + mod
+        heal = 0
+
+    class RecklessTackle:
+        mod = special[0]
+        name = "Reckless Tackle"
+        dam = 20 + mod
+        hit_back = rand.randint(1, 2)
+        if hit_back == 1:
+            heal = - (Character.max_health/10)
+        else:
+            heal = 0
+
+
+# mage
+class Mage:
+    class FireBall:
+        mod = special[4]
+        name = "Fire Ball"
+        dam = 10 + mod
+        heal = 0
+
+    class MagicOverload:
+        mod = special[4]
+        name = "Magic Overload"
+        dam = rand.randint(1, 12) + mod
+        heal = rand.randint(0, 5)
+
+
+# rogue
+class Rogue:
+    class Strike:
+        mod = special[5]
+        name = "Strike"
+        dam = 10 + mod
+        heal = 0
+
+    class BloodSteal:
+        mod = special[5]
+        name = "Blood Steal"
+        dam = 5 + int(mod / 2)
+        heal = 5 + int(mod / 2)
+
+
+# cleric
+class Cleric:
+    class LifeTap:
+        mod = special[4]
+        name = "Life Tap"
+        dam = 10 + mod
+        heal = 5 + int(mod / 4)
+
+    class HealingPrayer:
+        mod = special[4]
+        name = "Healing Prayer"
+        dam = 0
+        heal = 10 + mod
+
+
+# bard
+class Bard:
+    class Insult:
+        mod = special[3]
+        name = "Insult"
+        emotional_damage = rand.randint(1, 3)
+        print("FEELINGS HURT!")
+        if emotional_damage == 1:
+            dam = 15 + int(mod * 1.5)
+        else:
+            dam = 10 + mod
+        heal = 0
+
+    class Serenade:
+        mod = special[3]
+        name = "Serenade"
+        dam = 0
+        heal = 5 + mod
+
+
+# define characters abilities by their class
+# warrior
+if char_class == 1:
+    char_class_abilities = [Warrior.Slash, Warrior.RecklessTackle]
+# mage
+if char_class == 2:
+    char_class_abilities = [Mage.FireBall, Mage.MagicOverload]
+# rogue
+if char_class == 3:
+    char_class_abilities = [Rogue.Strike, Rogue.BloodSteal]
+# cleric
+if char_class == 4:
+    char_class_abilities = [Cleric.LifeTap, Cleric.HealingPrayer]
+# bard
+if char_class == 5:
+    char_class_abilities = [Bard.Insult, Bard.Serenade]
+
+
+# character
+class Character:
+    name = char_name
+    max_health = 100 + special[2]
+    health = 100 + special[2]
+    char_class_abilities = char_class_abilities
+    char_lvl = char_lvl
+
+
+# enemies
+class Enemies:
+    class Gooby:
+        name = "Gooby"
+        max_health = 50
+        health = 50
+        enemy_abilities = [ClassLess.Punch, ClassLess.Kick]
+
+    class EnemyWarrior:
+        name = "Enemy Warrior"
+        max_health = 150
+        health = 150
+        enemy_abilities = [Warrior.Slash, Warrior.RecklessTackle]
+
+    class EnemyMage:
+        name = "Enemy Mage"
+        max_health = 150
+        health = 150
+        enemy_abilities = [Mage.FireBall, Mage.MagicOverload]
+
+
+
+# COMBAT PROTOTYPE!!!
+combat(Enemies.EnemyMage)
+combat(Enemies.EnemyWarrior)
+combat(Enemies.Gooby)
+
+
